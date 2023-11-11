@@ -1,13 +1,17 @@
 const { CosmosClient } = require("@azure/cosmos");
 
 const cosmosClient = new CosmosClient(process.env.CosmosDBConnectionString);
-const databaseName = "YourCosmosDBDatabaseName";
-const containerName = "YourCosmosDBContainerName";
+const databaseName = "faoz-db";
+const containerName = "posts";
+
 
 module.exports = async function (context, req) {
     context.log("JavaScript HTTP trigger function processed a request.");
 
     try {
+        const database = cosmosClient.database(databaseName);
+        const container = database.container(containerName);
+
         // Extract the post ID from the query parameters
         const postId = req.query.id;
 
@@ -19,33 +23,26 @@ module.exports = async function (context, req) {
             return;
         }
 
-        const database = cosmosClient.database(databaseName);
-        const container = database.container(containerName);
-
-        // Query Cosmos DB to get the post by ID
-        const { resources: posts } = await container.items.query(`SELECT * FROM c WHERE c.id = @postId`, {
-            parameters: [{ name: "@postId", value: postId }],
-        }).fetchAll();
-
-        if (posts.length === 0) {
-            context.res = {
-                status: 404,
-                body: `Post with ID ${postId} not found.`,
-            };
-            return;
-        }
-
-        const post = posts[0];
+        // Use the read() method to get the post directly
+        const { resource: post } = await container.item(postId, postId).read();
 
         context.res = {
             status: 200,
             body: post,
         };
     } catch (error) {
-        context.log.error(error);
-        context.res = {
-            status: 500,
-            body: "Internal server error.",
-        };
+        if (error.code === 404) {
+            // Handle not found separately
+            context.res = {
+                status: 404,
+                body: `Post with ID ${postId} not found.`,
+            };
+        } else {
+            context.log.error(error);
+            context.res = {
+                status: 500,
+                body: "Internal server error.",
+            };
+        }
     }
 };

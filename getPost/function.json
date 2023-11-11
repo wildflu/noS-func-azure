@@ -8,7 +8,7 @@
       "methods": [
         "get"
       ],
-      "router":"getPost"
+      "route":"getPost"
     },
     {
       "type": "http",
