@@ -1,4 +1,5 @@
 
+
 const { CosmosClient } = require("@azure/cosmos");
 const { v4: uuidv4 } = require("uuid");
 
@@ -14,7 +15,7 @@ module.exports = async function (context, req) {
         const data = req.body;
 
         // Validate the required properties
-        if (!data || !data.name || !data.description || !data.content) {
+        if (!data || !data.name || !data.description || !data.content || !data.poster) {
             context.res = {
                 status: 400,
                 body: "Please provide name, description, and content in the request body.",
@@ -25,15 +26,13 @@ module.exports = async function (context, req) {
         const database = cosmosClient.database(databaseName);
         const container = database.container(containerName);
 
-        // Generate a unique ID using uuid
-        const postId = uuidv4();
-
         // Create the post object
         const post = {
-            // id: postId,
+            posterid:data.poster,
             name: data.name,
             description: data.description,
             content: data.content,
+            cteatedAt: new Date().toISOString()
         };
 
         // Add the post to Cosmos DB

@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@azure/cosmos": "^4.0.0",
+    "datetime": "^0.0.3",
     "uuid": "^9.0.1"
   }
 }
