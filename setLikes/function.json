@@ -1,0 +1,14 @@
+{
+  "bindings": [
+    {
+      "type": "cosmosDBTrigger",
+      "name": "documents",
+      "direction": "in",
+      "leaseCollectionName": "leases",
+      "connectionStringSetting": "CosmosDbConnectionString",
+      "databaseName": "faoz-db",
+      "collectionName": "posts",
+      "createLeaseCollectionIfNotExists": false
+    }
+  ]
+}
